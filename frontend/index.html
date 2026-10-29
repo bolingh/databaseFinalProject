@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mini THSR High-Speed Rail Booking System">
+  <title>Train Search | Mini THSR</title>
+  <!-- All four pages share this stylesheet, so styles only need to be updated here. -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Load the configuration before the application script. defer runs each script after HTML parsing. -->
+  <script src="js/config.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="examples/ui-example.js" defer></script>
+</head>
+<body data-page="search">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <!-- All four pages share this header. main.js fetches users from /users and populates the dropdown. -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">M</span> Mini THSR</a>
+
+      <div class="user-control">
+        <label for="current-user">Current User</label>
+        <!-- Keep the dropdown disabled until user data has loaded successfully.
+             An option with value="" means no user is selected; user names are not hard-coded in HTML. -->
+        <select id="current-user" aria-describedby="user-message" disabled>
+          <option value="">Select a user</option>
+        </select>
+        <!-- Fetch the user list again from the backend, including after a connection failure. -->
+        <button id="reload-users" class="button button-small button-secondary" type="button">Reload</button>
+      </div>
+    </div>
+    <div class="header-message"><p id="user-message" role="status" aria-live="polite">Loading users…</p></div>
+  </header>
+
+  <!-- The href attribute sets the destination; aria-current identifies the active page.
+       main.js uses localStorage to preserve the selected user across pages. -->
+  <nav class="site-nav" aria-label="Main navigation"><div class="nav-inner"><a href="index.html" aria-current="page">Train Search</a><a href="booking.html">Book Tickets</a><a href="bookings.html">Booking Overview</a><a href="booking-detail.html">Booking Details</a></div></nav>
+  <main id="main" class="container">
+    <div class="page-heading"><span class="eyebrow">MINI THSR</span><h1>Train Search</h1></div>
+    <section class="panel" aria-labelledby="example-title">
+      <h2 id="example-title">Frontend UI Example</h2>
+      <p class="help">This optional example is stored in the frontend only. It does not call a stations or schedules API and is not a completed assignment feature.</p>
+      <div class="actions"><button id="load-search-example" class="button button-secondary" type="button">Load Example Stations and Trains</button></div>
+    </section>
+    <section class="panel" aria-labelledby="search-title">
+      <h2 id="search-title">Search Criteria</h2>
+      <!-- Date, origin, and destination are required; both time fields are optional. The browser validates required fields. -->
+      <form id="search-form">
+        <div class="form-grid">
+          <div class="field"><label for="travel-date">Travel Date <span class="required">Required</span></label>
+            <!-- The native date input provides a calendar picker; submitted values use YYYY-MM-DD. -->
+            <input id="travel-date" name="date" type="date" min="2026-12-01" max="2027-01-31" required aria-describedby="date-help">
+            <p id="date-help" class="help">Choose a date from 2026-12-01 through 2027-01-31.</p></div>
+          <div class="field"><label for="from-station">Departure Station <span class="required">Required</span></label>
+
+            <!-- TODO: Connect GET /stations and populate the station options using renderStations().
+                 select defines a dropdown and option defines an entry. Only a placeholder is currently present; do not hard-code stations. -->
+            <select id="from-station" name="from_station_id" required><option value="">Select a station</option></select></div>
+          <div class="field"><label for="to-station">Arrival Station <span class="required">Required</span></label>
+
+            <!-- TODO: Populate destinations from the same GET /stations response; use station_id for values and name for labels. -->
+            <select id="to-station" name="to_station_id" required><option value="">Select a station</option></select></div>
+          <div class="field"><label for="earliest-time">Earliest Departure Time <span class="optional">Optional</span></label>
+            <input id="earliest-time" name="departure_time_from" type="time" step="60"><p class="help">Leave blank for no time restriction.</p></div>
+          <div class="field"><label for="latest-time">Latest Departure Time <span class="optional">Optional</span></label>
+            <input id="latest-time" name="departure_time_to" type="time" step="60"><p class="help">Leave blank for no time restriction.</p></div>
+        </div>
+        <div class="actions"><button class="button" type="submit">Search Trains</button></div>
+      </form>
+      <!-- JavaScript displays feedback here; role="status" announces updates to assistive technologies. -->
+      <p id="search-message" class="message" role="status" aria-live="polite"></p>
+    </section>
+    <section class="panel" aria-labelledby="results-title">
+      <h2 id="results-title">Search Results</h2>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Train Search Results">
+        <!-- table defines a table, thead its headers, tbody its rows, tr a row, and td a cell.
+             TODO: Implement the schedules API request in main.js, within initializeSearch().
+             Use /schedules as specified in the PDF. -->
+        <table><caption class="sr-only">Train Schedule List</caption>
+          <thead><tr><th scope="col">Train Number</th><th scope="col">Departure Time</th><th scope="col">Arrival Time</th><th scope="col">Available Seats</th><th scope="col">Actions</th></tr></thead>
+
+          <!-- colspan="5" spans all five columns. Once data is received, renderSchedules() replaces this placeholder
+               with booking links that include the train, date, stations, and departure/arrival times. -->
+          <tbody id="schedule-list"><tr><td colspan="5" class="empty-cell">No data available</td></tr></tbody>
+        </table>
+      </div>
+      <p class="help table-help">Scroll horizontally to view all columns.</p>
+      <!-- No train is selected yet, so this placeholder button remains disabled. -->
+      <div class="actions"><button class="button button-secondary" type="button" disabled>Book This Train</button></div>
+    </section>
+  </main>
+  <footer class="site-footer">Mini THSR High-Speed Rail Booking System</footer>
+  <!-- Show this message when JavaScript is disabled in the browser. -->
+  <noscript><p class="noscript">Enable JavaScript to load the current user.</p></noscript>
+</body>
+</html>

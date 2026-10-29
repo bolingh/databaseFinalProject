@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    head contains page metadata; body contains the visible page.
+    charset="UTF-8" supports Unicode text; viewport adapts layout to the device width.
+    HTML defines content and fields; colors and layout are defined in css/style.css.
+    id identifies an element for JavaScript; class applies CSS styles.
+    name identifies a form field and is also used to collect form values.
+  -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mini THSR High-Speed Rail Booking System">
+  <title>Book Tickets | Mini THSR</title>
+  <!-- All four pages share this stylesheet, so styles only need to be updated here. -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Load the configuration before the application script. defer runs each script after HTML parsing. -->
+  <script src="js/config.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="examples/ui-example.js" defer></script>
+</head>
+<body data-page="booking">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <!-- All four pages share this header. main.js fetches users from /users and populates the dropdown. -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">M</span> Mini THSR</a>
+
+      <div class="user-control">
+        <label for="current-user">Current User</label>
+        <!-- Keep the dropdown disabled until user data has loaded successfully.
+             An option with value="" means no user is selected; user names are not hard-coded in HTML. -->
+        <select id="current-user" aria-describedby="user-message" disabled>
+          <option value="">Select a user</option>
+        </select>
+        <!-- Fetch the user list again from the backend, including after a connection failure. -->
+        <button id="reload-users" class="button button-small button-secondary" type="button">Reload</button>
+      </div>
+    </div>
+    <div class="header-message"><p id="user-message" role="status" aria-live="polite">Loading users…</p></div>
+  </header>
+
+  <!-- The href attribute sets the destination; aria-current identifies the active page.
+       main.js uses localStorage to preserve the selected user across pages. -->
+  <nav class="site-nav" aria-label="Main navigation"><div class="nav-inner"><a href="index.html">Train Search</a><a href="booking.html" aria-current="page">Book Tickets</a><a href="bookings.html">Booking Overview</a><a href="booking-detail.html">Booking Details</a></div></nav>
+  <main id="main" class="container">
+    <div class="page-heading"><span class="eyebrow">MINI THSR</span><h1>Book Tickets</h1></div>
+    <section class="panel" aria-labelledby="trip-title">
+      <h2 id="trip-title">Selected Train</h2>
+      <!-- dl groups terms and descriptions: dt is the field label and dd is its value.
+           data-trip identifies which URL parameter JavaScript displays; missing values show a placeholder. -->
+      <dl class="detail-grid" id="selected-trip">
+        <div><dt>Train Number</dt><dd data-trip="train_no">No data available</dd></div>
+        <div><dt>Travel Date</dt><dd data-trip="date">No data available</dd></div>
+        <div><dt>Departure Station</dt><dd data-trip="from_station_id">No data available</dd></div>
+        <div><dt>Arrival Station</dt><dd data-trip="to_station_id">No data available</dd></div>
+        <div><dt>Departure Time</dt><dd data-trip="departure_time">No data available</dd></div>
+        <div><dt>Arrival Time</dt><dd data-trip="arrival_time">No data available</dd></div>
+      </dl>
+      <p id="trip-message" class="help">Select a train from the search results first.</p>
+    </section>
+    <section class="panel" aria-labelledby="booking-title">
+      <h2 id="booking-title">Booking Information</h2>
+      <form id="booking-form">
+        <div class="form-grid booking-grid">
+          <div class="field"><label for="seat-count">Number of Tickets <span class="required">Required</span></label>
+            <!-- type="number", min, max, and step let the browser validate whole numbers from 1 to 5.
+                 value="1" is the default ticket count; normal form submission rejects values such as 6 or 1.5. -->
+            <input id="seat-count" name="seat_count" type="number" min="1" max="5" step="1" value="1" required><p class="help">Enter an integer from 1 to 5.</p></div>
+          <div class="field"><label for="preference">Seat Preference <span class="optional">Optional</span></label>
+
+            <!-- This text field accepts arbitrary input, not just window or aisle; for example, abc is allowed.
+                 The booking API is not connected yet. The backend will validate the value; a blank preference is sent as null. -->
+            <input id="preference" name="preference" type="text" aria-describedby="preference-help">
+            <p id="preference-help" class="help">For a single ticket, enter <code>window</code> (window seat) or <code>aisle</code> (aisle seat). Leave blank for no preference.</p></div>
+          <!-- Adjacent seating is a Boolean option for 2–5 tickets and is never automatically selected.
+               It does not apply to one ticket, so the checkbox is cleared and disabled. The backend assigns seats. -->
+          <div class="field field-wide"><label class="checkbox-label" for="adjacent"><input id="adjacent" name="adjacent" type="checkbox" disabled>Adjacent Seats</label></div>
+        </div>
+        <!-- main.js submits to POST /bookings and opens Booking Details only after success.
+             The backend must implement this API; errors stay on this page. The back link navigates normally. -->
+        <div class="actions"><button class="button" type="submit">Confirm Booking</button><a class="button button-secondary" href="index.html">Back to Train Search</a></div>
+      </form>
+      <p id="booking-message" class="message" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <footer class="site-footer">Mini THSR High-Speed Rail Booking System</footer>
+  <!-- Show this message when JavaScript is disabled in the browser. -->
+  <noscript><p class="noscript">Enable JavaScript to load the current user.</p></noscript>
+</body>
+</html>

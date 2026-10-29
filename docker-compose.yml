@@ -1,0 +1,77 @@
+# All settings come from .env in this folder.
+# After changing the database settings, run `docker compose down -v`
+# so the database is recreated with them
+
+services:
+  # Static frontend. API integration is intentionally left for students.
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "8080:80"
+
+  # PostgreSQL database
+  db:
+    image: postgres:17
+    # Database name and login, taken from .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    # Expose the database on localhost:DB_PORT for local tools (e.g. psql, DBeaver)
+    ports:
+      - "${DB_PORT}:5432"
+    # Store data in the named volume pgdata, so it survives `docker compose down`;
+    # only `docker compose down -v` deletes it
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Report healthy once the database accepts TCP connections
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 2s
+      retries: 30
+
+  # One-off job: create tables and import CSV data
+  db-init:
+    build: ./backend
+    # Run db_init.py instead of the image's default command
+    command: ["python", "db_init.py"]
+    # Start only after db is healthy
+    depends_on:
+      db:
+        condition: service_healthy
+    # Load settings from .env; after editing it, run `docker compose up` again
+    env_file: ./.env
+    # Override .env: inside Docker, reach db by its service name and internal port
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+    # Mount the schema and CSV data (read-only), which are outside ./backend
+    volumes:
+      - ./data:/app/data:ro
+      - ./schema:/app/schema:ro
+
+  # Flask API server
+  backend:
+    build: ./backend
+    # Start only after db-init has finished successfully
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    # Same settings as db-init
+    env_file: ./.env
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      # Never expose Flask's interactive debugger on the published port
+      DEBUG: "false"
+    # Expose the API on localhost:8000
+    ports:
+      - "8000:8000"
+
+# Named volumes managed by Docker
+volumes:
+  # PostgreSQL data files
+  pgdata:

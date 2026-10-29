@@ -1,0 +1,14 @@
+# Local environment
+.env
+
+# Generated Python files
+**/__pycache__/
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

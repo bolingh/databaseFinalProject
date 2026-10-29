@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mini THSR High-Speed Rail Booking System">
+  <title>Booking Details | Mini THSR</title>
+  <!-- All four pages share this stylesheet, so styles only need to be updated here. -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Load the configuration before the application script. defer runs each script after HTML parsing. -->
+  <script src="js/config.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="examples/ui-example.js" defer></script>
+</head>
+<body data-page="detail">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <!-- All four pages share this header. main.js fetches users from /users and populates the dropdown. -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">M</span> Mini THSR</a>
+
+      <div class="user-control">
+        <label for="current-user">Current User</label>
+        <!-- Keep the dropdown disabled until user data has loaded successfully.
+             An option with value="" means no user is selected; user names are not hard-coded in HTML. -->
+        <select id="current-user" aria-describedby="user-message" disabled>
+          <option value="">Select a user</option>
+        </select>
+        <!-- Fetch the user list again from the backend, including after a connection failure. -->
+        <button id="reload-users" class="button button-small button-secondary" type="button">Reload</button>
+      </div>
+    </div>
+    <div class="header-message"><p id="user-message" role="status" aria-live="polite">Loading users…</p></div>
+  </header>
+
+  <!-- The href attribute sets the destination; aria-current identifies the active page.
+       main.js uses localStorage to preserve the selected user across pages. -->
+  <nav class="site-nav" aria-label="Main navigation"><div class="nav-inner"><a href="index.html">Train Search</a><a href="booking.html">Book Tickets</a><a href="bookings.html">Booking Overview</a><a href="booking-detail.html" aria-current="page">Booking Details</a></div></nav>
+  <main id="main" class="container">
+    <div class="page-heading"><span class="eyebrow">MINI THSR</span><h1>Booking Details</h1></div>
+    <section class="panel" aria-labelledby="detail-title">
+      <h2 id="detail-title">Booking Information</h2>
+      <!-- Details and overview are separate pages. dt contains a field label and dd contains its value.
+           data-booking maps to a backend field; JavaScript populates the matching element after receiving data.
+           main.js calls GET /bookings with the current user_id and the URL booking_id; the response is an array. -->
+      <dl id="booking-detail" class="detail-grid">
+        <div><dt>Booking ID</dt><dd data-booking="booking_id">No data available</dd></div>
+        <div><dt>User</dt><dd data-booking="user_id">No data available</dd></div>
+        <div><dt>Train Number</dt><dd data-booking="train_no">No data available</dd></div>
+        <div><dt>Travel Date</dt><dd data-booking="date">No data available</dd></div>
+        <div><dt>Departure Station</dt><dd data-booking="from_station_id">No data available</dd></div>
+        <div><dt>Arrival Station</dt><dd data-booking="to_station_id">No data available</dd></div>
+        <div><dt>Departure Time</dt><dd data-booking="departure_time">No data available</dd></div>
+        <div><dt>Arrival Time</dt><dd data-booking="arrival_time">No data available</dd></div>
+        <div><dt>Number of Tickets</dt><dd data-booking="seat_count">No data available</dd></div>
+        <div><dt>All Seat Numbers</dt><dd data-booking="seats">No data available</dd></div>
+        <div><dt>Seat Preference</dt><dd data-booking="preference">No data available</dd></div>
+        <div><dt>Preference Fulfilled</dt><dd data-booking="preference_met">No data available</dd></div>
+        <div><dt>Adjacent Seats Fulfilled</dt><dd data-booking="adjacent_met">No data available</dd></div>
+        <div><dt>Booking Status</dt><dd data-booking="status">No data available</dd></div>
+
+      </dl>
+      <p id="detail-message" class="message" role="status" aria-live="polite"></p>
+      <!-- The overview link navigates directly; main.js handles cancellation in initializeDetail().
+           TODO: POST /bookings/{booking_id}/cancel with the selected user_id in the request body.
+           Update the status only after the backend confirms cancellation; for now, the button only shows feedback. -->
+      <div class="actions"><a class="button button-secondary" href="bookings.html">Back to Booking Overview</a><button id="cancel-booking" class="button button-danger" type="button" disabled>Cancel Booking</button></div>
+      <p class="help">Cancellation applies to the entire booking, including all tickets.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Mini THSR High-Speed Rail Booking System</footer>
+  <!-- Show this message when JavaScript is disabled in the browser. -->
+  <noscript><p class="noscript">Enable JavaScript to load the current user.</p></noscript>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# 將所有文字檔在提交時強制轉為 LF，簽出時保持 LF
+* text=auto eol=lf
