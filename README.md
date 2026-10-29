@@ -115,6 +115,12 @@ curl http://localhost:8000/users
 
 ---
 
+## 一些AI對程式碼的解釋
+
+[連結](https://hackmd.io/@boling/rkcqEVe6ze)
+
+以下是助教要求包含在README的。
+
 ## 啟動步驟
 ```bash
 docker compose up -d --build
